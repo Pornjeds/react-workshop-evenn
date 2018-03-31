@@ -1,94 +1,132 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import moment from 'moment';
+import { connect } from 'react-redux';
+import { setField, resetField } from './redux';
+
+const initialState = {
+  name: 'aaa',
+  email: '',
+  ticketType: 'standard',
+  food: false,
+  agree: false,
+  countDown: '',
+};
+
+const closeTime = moment('2018-04-01 12:00');
 
 class App extends Component {
+  state = initialState;
+
+  componentDidMount() {
+    setInterval(() => {
+      const millis = closeTime.diff(moment());
+      const duration = moment.duration(millis);
+      this.setState({
+        countDown: `${duration.hours()} hours ${duration.minutes()} minutes ${duration.seconds()} seconds`,
+      });
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
   render() {
+    const { name, email, ticketType, food, agree, countDown, setField, resetField } = this.props;
     return (
       <section className="section">
         <section className="container">
           <h1 className="title">Evenn Registration Form</h1>
-          <div class="field">
-            <label class="label">Name</label>
-            <div class="control">
-              <input class="input" type="text" placeholder="Text input" />
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="label">Username</label>
-            <div class="control has-icons-left has-icons-right">
-              <input class="input is-success" type="text" placeholder="Text input" value="bulma" />
-              <span class="icon is-small is-left">
-                <i class="fas fa-user" />
-              </span>
-              <span class="icon is-small is-right">
-                <i class="fas fa-check" />
-              </span>
-            </div>
-            <p class="help is-success">This username is available</p>
-          </div>
-
-          <div class="field">
-            <label class="label">Email</label>
-            <div class="control has-icons-left has-icons-right">
+          <p>Registration expired in {countDown}</p>
+          <div className="field">
+            <label className="label">Name</label>
+            <div className="control">
               <input
-                class="input is-danger"
+                className="input"
+                type="text"
+                onChange={e => setField('name', e.target.value)}
+                value={name}
+                placeholder="Text input"
+              />
+            </div>
+          </div>
+
+          <div className="field">
+            <label className="label">Email</label>
+            <div className="control has-icons-left has-icons-right">
+              <input
+                className="input is-danger"
                 type="email"
                 placeholder="Email input"
-                value="hello@"
+                onChange={e => setField('email', e.target.value)}
+                value={email}
               />
-              <span class="icon is-small is-left">
-                <i class="fas fa-envelope" />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope" />
               </span>
-              <span class="icon is-small is-right">
-                <i class="fas fa-exclamation-triangle" />
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle" />
               </span>
             </div>
-            <p class="help is-danger">This email is invalid</p>
+            <p className="help is-danger">This email is invalid</p>
           </div>
 
-          <div class="field">
-            <label class="label">Ticket Type</label>
-            <div class="control">
-              <div class="select">
-                <select>
-                  <option>Standard</option>
-                  <option>Premium</option>
+          <div className="field">
+            <label className="label">Ticket Type</label>
+            <div className="control">
+              <div className="select">
+                <select onChange={e => setField('ticketType', e.target.value)}>
+                  <option value="standard">Standard</option>
+                  <option value="premium">Premium</option>
                 </select>
               </div>
             </div>
           </div>
 
-          <div class="field">
-            <label class="label">Add food?</label>
-            <div class="control">
-              <label class="radio">
-                <input type="radio" name="question" />
+          <div className="field">
+            <label className="label">Add food?</label>
+            <div className="control">
+              <label className="radio">
+                <input
+                  type="radio"
+                  name="question"
+                  checked={food}
+                  onChange={e => setField('food', true)}
+                />
                 Yes +50THB
               </label>
-              <label class="radio">
-                <input type="radio" name="question" />
+              <label className="radio">
+                <input
+                  type="radio"
+                  name="question"
+                  onChange={e => setField('food', false)}
+                  checked={!food}
+                />
                 No
               </label>
             </div>
           </div>
 
-          <div class="field">
-            <div class="control">
-              <label class="checkbox">
-                <input type="checkbox" />
+          <div className="field">
+            <div className="control">
+              <label className="checkbox">
+                <input type="checkbox" onChange={e => setField('agree', !agree)} />
                 I agree to the <a href="#">terms and conditions</a>
               </label>
             </div>
           </div>
 
-          <div class="field is-grouped">
-            <div class="control">
-              <button class="button is-link">Submit</button>
+          <p>Price: 100THB</p>
+
+          <div className="field is-grouped">
+            <div className="control">
+              <button className="button is-link">Submit</button>
             </div>
-            <div class="control">
-              <button class="button is-text">Cancel</button>
+            <div className="control">
+              <button className="button is-text" onClick={resetField}>
+                Cancel
+              </button>
             </div>
           </div>
         </section>
@@ -97,4 +135,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(state => state, { setField: setField, resetField: resetField })(App);
