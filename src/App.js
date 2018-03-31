@@ -7,7 +7,7 @@ class App extends Component {
     return (
       <section className="section">
         <section className="container">
-          <h1>Evenn Registration Form</h1>
+          <h1 className="title">Evenn Registration Form</h1>
           <div class="field">
             <label class="label">Name</label>
             <div class="control">
